@@ -144,7 +144,9 @@ def get_best_practices():
 def compare_agents():
     """Main endpoint for comparing two AI agents"""
     try:
+        print("=== COMPARE ENDPOINT CALLED ===")
         data = request.get_json()
+        print(f"Request data received: {data}")
         agent1_id = data.get('agent1_id')
         agent2_id = data.get('agent2_id')
         question = data.get('question')
@@ -160,7 +162,9 @@ def compare_agents():
             return jsonify({"error": "Cannot compare an agent with itself"}), 400
         
         # Initialize AI service
+        print("About to initialize AIService...")
         ai_service = AIService()
+        print("AIService initialized successfully")
         
         # Validate models are available
         valid1, msg1 = ai_service.validate_model_availability(agent1_id)
@@ -199,6 +203,7 @@ def compare_agents():
         agent2_info = ai_service.get_model_info(agent2_id)
         
         # Step 1: Get initial responses from both agents
+        print("Aboutto call first AI service...")
         try:
             response1 = ai_service.get_completion(
                 agent1_info['provider'], 
@@ -206,6 +211,9 @@ def compare_agents():
                 enhanced_question
             )
         except Exception as e:
+            print(f"FULL ERROR: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return jsonify({
                 "error": f"Error getting response from {agent1_info['name']}: {str(e)}"
             }), 500
