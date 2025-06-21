@@ -348,7 +348,7 @@ const startFollowUpChain = () => {
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Intern Stack</h1>
           </div>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Compare AI answers side-by-side with cross-assessments.
+            Compare AI answers side-by-side with optional cross-assessments.
           </p>
         </div>
 
