@@ -571,7 +571,7 @@ const startFollowUpChain = () => {
                     ) : (
                       <>
                         <Zap className="mr-2 h-4 w-4" />
-                        Ask Both Agents
+                        Ask Both Interns
                       </>
                     )}
                   </Button>
@@ -580,12 +580,6 @@ const startFollowUpChain = () => {
             </Card>
           </div>
         )}
-    
-        {/* Footer */}
-        <div className="text-center mt-12 text-sm text-gray-500 dark:text-gray-400">
-          <p>Intern Stack MVP - Compare AI agents and make better decisions</p>
-          <p className="mt-1">Built with React, Tailwind CSS, and Flask</p>
-        </div>
     
         {/* Footer */}
         <div className="text-center mt-12 text-sm text-gray-500 dark:text-gray-400">
