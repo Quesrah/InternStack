@@ -81,7 +81,7 @@ function App() {
 
   const handleCompare = async () => {
     if (!selectedAgent1 || !selectedAgent2 || !question.trim()) {
-      setError('Please select two agents and enter a question.');
+      setError('Select two agents and enter a question.');
       return;
     }
 
@@ -348,7 +348,7 @@ const startFollowUpChain = () => {
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Intern Stack</h1>
           </div>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Compare AI agents side-by-side to build confidence. This is most valuable for: complex questions with multiple valid perspectives, technical tasks where accuracy matters, creative prompts where style and structure vary, and evaluating trustworthiness of AI responses.
+            Compare AI agents side-by-side and get them to assess each other. This is most valuable for: complex questions with multiple valid perspectives, technical tasks where accuracy matters, and creative prompts where style and structure vary.
           </p>
         </div>
 
@@ -361,15 +361,15 @@ const startFollowUpChain = () => {
                 Agent Comparison
               </CardTitle>
               <CardDescription>
-                Select two AI agents and ask them a question to compare their responses
+                Select the interns you want to compare.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Agent Selection */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium mb-2 block">First Agent</label>
-                  {renderAgentSelect(selectedAgent1, setSelectedAgent1, "Select first agent")}
+                  <label className="text-sm font-medium mb-2 block">First Intern</label>
+                  {renderAgentSelect(selectedAgent1, setSelectedAgent1, "Select first intern")}
                   {selectedAgent1 && (
                     <div className="mt-2 flex flex-wrap gap-1">
                       {getAgentById(selectedAgent1)?.tags.map(tag => (
@@ -381,8 +381,8 @@ const startFollowUpChain = () => {
                   )}
                 </div>
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Second Agent</label>
-                  {renderAgentSelect(selectedAgent2, setSelectedAgent2, "Select second agent")}
+                  <label className="text-sm font-medium mb-2 block">Second Intern</label>
+                  {renderAgentSelect(selectedAgent2, setSelectedAgent2, "Select second intern")}
                   {selectedAgent2 && (
                     <div className="mt-2 flex flex-wrap gap-1">
                       {getAgentById(selectedAgent2)?.tags.map(tag => (
