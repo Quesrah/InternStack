@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea.jsx';
 import { Checkbox } from '@/components/ui/checkbox.jsx';
 import { Badge } from '@/components/ui/badge.jsx';
-import { Loader2, Brain, Zap, AlertCircle, RefreshCw } from 'lucide-react';
+import { Loader2, Brain, Zap, AlertCircle, RefreshCw, Users, SquareStack, ArrowRightLeft } from 'lucide-react';
 import './App.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
@@ -18,14 +18,19 @@ function App() {
   const [question, setQuestion] = useState('');
   const [selectedPractices, setSelectedPractices] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [results, setResults] = useState(null);
-  const [error, setError] = useState(null);
   const [followUps, setFollowUps] = useState([]);  
-  const [followUpQuestions, setFollowUpQuestions] = useState({}); // NEW: Track questions for each follow-up
+  const [followUpQuestions, setFollowUpQuestions] = useState({});
   const [isFollowUpLoading, setIsFollowUpLoading] = useState(false);
   const [showFollowUpInput, setShowFollowUpInput] = useState(false);
   const [conversationHistory, setConversationHistory] = useState([]);
-  const [activeFollowUpIndex, setActiveFollowUpIndex] = useState(-1); // NEW: Track which follow-up is active
+  const [activeFollowUpIndex, setActiveFollowUpIndex] = useState(-1); 
+  const [results, setResults] = useState(null);
+  const [error, setError] = useState(null);
+  const [currentFollowUpQuestion, setCurrentFollowUpQuestion] = useState('');
+  const [assessments, setAssessments] = useState(null); // NEW: Store original assessments
+  const [followUpAssessments, setFollowUpAssessments] = useState([]); // NEW: Store follow-up assessments
+  const [isAssessmentLoading, setIsAssessmentLoading] = useState(false); // NEW: Assessment loading state
+
 
   // Load agents and best practices on component mount
   useEffect(() => {
@@ -108,11 +113,12 @@ function App() {
 
       if (data.agent1 && data.agent2) {
         setResults(data);
-        // CHANGED: Reset follow-ups when starting new conversation
         setFollowUps([]);
         setFollowUpQuestions({});
         setActiveFollowUpIndex(-1);
         setShowFollowUpInput(false);
+        setAssessments(null);
+        setFollowUpAssessments([]);
         // Add to conversation history
         setConversationHistory([{
           question: question.trim(),
@@ -141,8 +147,50 @@ function App() {
     setResults(null);
   };
 
+  const handleGetAssessment = async (questionText, agent1Response, agent2Response, isFollowUp = false, followUpIndex = null) => {
+    setIsAssessmentLoading(true);
+    setError(null);
 
-const handleFollowUp = async (followUpIndex) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/assess`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          agent1_id: selectedAgent1,
+          agent2_id: selectedAgent2,
+          question: questionText,
+          agent1_response: agent1Response,
+          agent2_response: agent2Response
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        if (isFollowUp && followUpIndex !== null) {
+          // Store follow-up assessment
+          setFollowUpAssessments(prev => {
+            const newAssessments = [...prev];
+            newAssessments[followUpIndex] = data;
+            return newAssessments;
+          });
+        } else {
+          // Store original assessment
+          setAssessments(data);
+        }
+      } else {
+        setError(data.error || 'Failed to get assessment');
+      }
+    } catch (error) {
+      setError('Failed to get assessment. Please try again.');
+    } finally {
+      setIsAssessmentLoading(false);
+    }
+  };
+
+  const handleFollowUp = async (followUpIndex) => {
   const questionText = followUpQuestions[followUpIndex]; 
   if (!questionText || !questionText.trim()) {
     setError('Enter a follow-up question.');
@@ -278,7 +326,7 @@ const startFollowUpChain = () => {
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Intern Stack</h1>
           </div>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Compare AI agents side-by-side and get cross-assessments to make better decisions
+            Compare AI agents side-by-side to build confidence. This is most valuable for: complex questions with multiple valid perspectives, technical tasks where accuracy matters, creative prompts where style and structure vary, and evaluating trustworthiness of AI responses.
           </p>
         </div>
 
@@ -406,19 +454,13 @@ const startFollowUpChain = () => {
                   <Brain className="h-5 w-5 text-blue-600" />
                   {results.agent1.name}
                 </CardTitle>
-                <CardDescription>Original response and assessment</CardDescription>
+                <CardDescription>Original response</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <h4 className="font-medium mb-2">Original Response:</h4>
                   <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-200 dark:border-blue-800">
                     <p className="text-sm whitespace-pre-wrap">{results.agent1.response}</p>
-                  </div>
-                </div>
-                <div>
-                  <h4 className="font-medium mb-2">Assessment by {results.agent2.name}:</h4>
-                  <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-md border">
-                    <p className="text-sm whitespace-pre-wrap">{results.agent2.assessment_by_agent1}</p>
                   </div>
                 </div>
               </CardContent>
@@ -431,7 +473,7 @@ const startFollowUpChain = () => {
                   <Brain className="h-5 w-5 text-green-600" />
                   {results.agent2.name}
                 </CardTitle>
-                <CardDescription>Original response and assessment</CardDescription>
+                <CardDescription>Original response</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -440,20 +482,70 @@ const startFollowUpChain = () => {
                     <p className="text-sm whitespace-pre-wrap">{results.agent2.response}</p>
                   </div>
                 </div>
-                <div>
-                  <h4 className="font-medium mb-2">Assessment by {results.agent1.name}:</h4>
-                  <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-md border">
-                    <p className="text-sm whitespace-pre-wrap">{results.agent1.assessment_by_agent2}</p>
-                  </div>
-                </div>
               </CardContent>
             </Card>
           </div>
         )}
 
+        {/* Assessment Section */}
+        {results && (
+          <div className="text-center mt-8 space-y-4">
+            {!assessments && (
+              <Button
+                onClick={() => handleGetAssessment(question, results.agent1.response, results.agent2.response)}
+                disabled={isAssessmentLoading}
+                className="h-12 px-8 text-lg font-medium bg-purple-600 hover:bg-purple-700"
+              >
+                <Users className="mr-2 h-5 w-5" />
+                {isAssessmentLoading ? 'Getting Assessments...' : 'Have the interns assess each other'}
+              </Button>
+            )}
+          </div>
+        )}
+
+        {/* Assessment Results */}
+        {assessments && (
+          <div className="mt-8">
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Cross-Assessments</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Agent 1 Assessment */}
+              <Card className="shadow-lg border-purple-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5 text-purple-600" />
+                    {assessments.assessor_info.agent2_name} assesses {assessments.assessor_info.agent1_name}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-md border border-purple-200 dark:border-purple-800">
+                    <p className="text-sm whitespace-pre-wrap">{assessments.agent1_assessment_by_agent2}</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Agent 2 Assessment */}
+              <Card className="shadow-lg border-purple-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5 text-purple-600" />
+                    {assessments.assessor_info.agent1_name} assesses {assessments.assessor_info.agent2_name}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-md border border-purple-200 dark:border-purple-800">
+                    <p className="text-sm whitespace-pre-wrap">{assessments.agent2_assessment_by_agent1}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
 
         {/* Follow-up Section */}
-        {results && activeFollowUpIndex === -1 && ( // CHANGED: Only show if no follow-ups started
+        {results && activeFollowUpIndex === -1 && ( // Only show if no follow-ups started
           <div className="mt-8">
             <div className="text-center">
               <Button
@@ -494,12 +586,6 @@ const startFollowUpChain = () => {
                           <p className="text-sm whitespace-pre-wrap">{followUp.results.agent1.response}</p>
                         </div>
                       </div>
-                      <div>
-                        <h4 className="font-medium mb-2">Assessment by {followUp.results.agent2.name}:</h4>
-                        <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-md border">
-                          <p className="text-sm whitespace-pre-wrap">{followUp.results.agent1.assessment_by_agent2}</p>
-                        </div>
-                      </div>
                     </CardContent>
                   </Card>
 
@@ -518,15 +604,73 @@ const startFollowUpChain = () => {
                           <p className="text-sm whitespace-pre-wrap">{followUp.results.agent2.response}</p>
                         </div>
                       </div>
-                      <div>
-                        <h4 className="font-medium mb-2">Assessment by {followUp.results.agent1.name}:</h4>
-                        <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-md border">
-                          <p className="text-sm whitespace-pre-wrap">{followUp.results.agent2.assessment_by_agent1}</p>
-                        </div>
-                      </div>
                     </CardContent>
                   </Card>
                 </div>
+
+
+
+                {/* Assessment and Follow-up buttons */}
+                <div className="text-center mt-6 space-y-4">
+                  {/* Assessment button for this follow-up */}
+                  {!followUpAssessments[index] && (
+                    <Button
+                      onClick={() => handleGetAssessment(
+                        followUp.question, 
+                        followUp.results.agent1.response, 
+                        followUp.results.agent2.response, 
+                        true, 
+                        index
+                      )}
+                      disabled={isAssessmentLoading}
+                      className="h-12 px-8 text-lg font-medium bg-purple-600 hover:bg-purple-700"
+                    >
+                      <Users className="mr-2 h-5 w-5" />
+                      {isAssessmentLoading ? 'Getting Assessments...' : 'Have the interns assess each other'}
+                    </Button>
+                  )}
+                </div>
+                
+                {/* Follow-up Assessment Results */}
+                {followUpAssessments[index] && (
+                  <div className="mt-6">
+                    <div className="text-center mb-4">
+                      <h4 className="text-lg font-bold text-gray-900 dark:text-white">Follow-up Cross-Assessments</h4>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      {/* Agent 1 Assessment */}
+                      <Card className="shadow-md border-purple-200">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="flex items-center gap-2 text-sm">
+                            <Users className="h-4 w-4 text-purple-600" />
+                            {followUpAssessments[index].assessor_info.agent2_name} assesses {followUpAssessments[index].assessor_info.agent1_name}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-md border border-purple-200 dark:border-purple-800">
+                            <p className="text-xs whitespace-pre-wrap">{followUpAssessments[index].agent1_assessment_by_agent2}</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      {/* Agent 2 Assessment */}
+                      <Card className="shadow-md border-purple-200">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="flex items-center gap-2 text-sm">
+                            <Users className="h-4 w-4 text-purple-600" />
+                            {followUpAssessments[index].assessor_info.agent1_name} assesses {followUpAssessments[index].assessor_info.agent2_name}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-md border border-purple-200 dark:border-purple-800">
+                            <p className="text-xs whitespace-pre-wrap">{followUpAssessments[index].agent2_assessment_by_agent1}</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </div>
+                )}
               </>
             )}
             

@@ -227,36 +227,7 @@ def compare_agents():
         except Exception as e:
             return jsonify({
                 "error": f"Error getting response from {agent2_info['name']}: {str(e)}"
-            }), 500
-        
-        # Step 2: Get cross-assessments
-        assessment_prompt_template = """I asked the following question:
-"{question}"
-
-I received this answer:
-"{answer}"
-
-Assess its accuracy and completeness. Suggest improvements or revisions if needed."""
-        
-        # Agent 2 assesses Agent 1's response
-        try:
-            assessment1 = ai_service.get_completion(
-                agent2_info['provider'],
-                agent2_info['model'],
-                assessment_prompt_template.format(question=question, answer=response1)
-            )
-        except Exception as e:
-            assessment1 = f"Error getting assessment: {str(e)}"
-        
-        # Agent 1 assesses Agent 2's response
-        try:
-            assessment2 = ai_service.get_completion(
-                agent1_info['provider'],
-                agent1_info['model'],
-                assessment_prompt_template.format(question=question, answer=response2)
-            )
-        except Exception as e:
-            assessment2 = f"Error getting assessment: {str(e)}"
+            }), 500 
         
         # Return comprehensive comparison results
         return jsonify({
@@ -269,7 +240,6 @@ Assess its accuracy and completeness. Suggest improvements or revisions if neede
                 "domains": agent1_info['domains'],
                 "tags": agent1_info['tags'],
                 "response": response1,
-                "assessment_by_agent2": assessment2
             },
             "agent2": {
                 "id": agent2_id,
@@ -278,13 +248,76 @@ Assess its accuracy and completeness. Suggest improvements or revisions if neede
                 "domains": agent2_info['domains'],
                 "tags": agent2_info['tags'],
                 "response": response2,
-                "assessment_by_agent1": assessment1
             },
             "timestamp": time.time()
         })
         
     except Exception as e:
         return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
+
+
+@api_bp.route('/assess', methods=['POST'])
+def assess_responses():
+    """Get cross-assessments for existing responses"""
+    try:
+        data = request.get_json()
+        agent1_id = data.get('agent1_id')
+        agent2_id = data.get('agent2_id')
+        question = data.get('question')
+        agent1_response = data.get('agent1_response')
+        agent2_response = data.get('agent2_response')
+        
+        # Validate input
+        if not all([agent1_id, agent2_id, question, agent1_response, agent2_response]):
+            return jsonify({"error": "Missing required fields"}), 400
+        
+        # Initialize AI service
+        ai_service = AIService()
+        
+        # Get agent information
+        agent1_info = ai_service.get_model_info(agent1_id)
+        agent2_info = ai_service.get_model_info(agent2_id)
+        
+        assessment_prompt_template = """I asked the following question:
+"{question}"
+
+I received this answer:
+"{answer}"
+
+Assess its accuracy and completeness. Suggest improvements or revisions if needed."""
+        
+        # Agent 2 assesses Agent 1's response
+        try:
+            assessment_of_agent1 = ai_service.get_completion(
+                agent2_info['provider'],
+                agent2_info['model'],
+                assessment_prompt_template.format(question=question, answer=agent1_response)
+            )
+        except Exception as e:
+            assessment_of_agent1 = f"Error getting assessment: {str(e)}"
+        
+        # Agent 1 assesses Agent 2's response
+        try:
+            assessment_of_agent2 = ai_service.get_completion(
+                agent1_info['provider'],
+                agent1_info['model'],
+                assessment_prompt_template.format(question=question, answer=agent2_response)
+            )
+        except Exception as e:
+            assessment_of_agent2 = f"Error getting assessment: {str(e)}"
+        
+        return jsonify({
+            "agent1_assessment_by_agent2": assessment_of_agent1,
+            "agent2_assessment_by_agent1": assessment_of_agent2,
+            "assessor_info": {
+                "agent1_name": agent1_info['name'],
+                "agent2_name": agent2_info['name']
+            }
+        })
+        
+    except Exception as e:
+        return jsonify({"error": f"Assessment error: {str(e)}"}), 500
+
 
 @api_bp.route('/agent/<agent_id>', methods=['GET'])
 def get_agent_details(agent_id):
