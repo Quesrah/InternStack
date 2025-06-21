@@ -10,6 +10,16 @@ import './App.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
 
+const ASSESSMENT_CRITERIA = [
+  'Accuracy & factual correctness',
+  'Completeness & thoroughness',
+  'Clarity & communication',
+  'Practical applicability',
+  'Creative approach',
+  'Technical depth',
+  'Potential risks or limitations'
+];
+
 function App() {
   const [agents, setAgents] = useState([]);
   const [bestPractices, setBestPractices] = useState([]);
@@ -27,9 +37,11 @@ function App() {
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
   const [currentFollowUpQuestion, setCurrentFollowUpQuestion] = useState('');
-  const [assessments, setAssessments] = useState(null); // NEW: Store original assessments
-  const [followUpAssessments, setFollowUpAssessments] = useState([]); // NEW: Store follow-up assessments
-  const [isAssessmentLoading, setIsAssessmentLoading] = useState(false); // NEW: Assessment loading state
+  const [assessments, setAssessments] = useState(null); 
+  const [followUpAssessments, setFollowUpAssessments] = useState([]); 
+  const [isAssessmentLoading, setIsAssessmentLoading] = useState(false); 
+  const [selectedAssessmentCriteria, setSelectedAssessmentCriteria] = useState([]);
+  const [showAssessmentOptions, setShowAssessmentOptions] = useState(false);
 
 
   // Load agents and best practices on component mount
@@ -119,6 +131,7 @@ function App() {
         setShowFollowUpInput(false);
         setAssessments(null);
         setFollowUpAssessments([]);
+        setSelectedAssessmentCriteria([]);
         // Add to conversation history
         setConversationHistory([{
           question: question.trim(),
@@ -147,6 +160,14 @@ function App() {
     setResults(null);
   };
 
+const handleAssessmentCriteriaToggle = (criteria) => {
+    setSelectedAssessmentCriteria(prev => 
+      prev.includes(criteria) 
+        ? prev.filter(c => c !== criteria)
+        : [...prev, criteria]
+    );
+  };
+
   const handleGetAssessment = async (questionText, agent1Response, agent2Response, isFollowUp = false, followUpIndex = null) => {
     setIsAssessmentLoading(true);
     setError(null);
@@ -162,7 +183,8 @@ function App() {
           agent2_id: selectedAgent2,
           question: questionText,
           agent1_response: agent1Response,
-          agent2_response: agent2Response
+          agent2_response: agent2Response,
+          assessment_criteria: selectedAssessmentCriteria
         }),
       });
 
@@ -488,18 +510,51 @@ const startFollowUpChain = () => {
         )}
 
         {/* Assessment Section */}
-        {results && (
-          <div className="text-center mt-8 space-y-4">
-            {!assessments && (
-              <Button
-                onClick={() => handleGetAssessment(question, results.agent1.response, results.agent2.response)}
-                disabled={isAssessmentLoading}
-                className="h-12 px-8 text-lg font-medium bg-purple-600 hover:bg-purple-700"
-              >
-                <Users className="mr-2 h-5 w-5" />
-                {isAssessmentLoading ? 'Getting Assessments...' : 'Have the interns assess each other'}
-              </Button>
-            )}
+        {results && !assessments && (
+          <div className="mt-8">
+            <Card className="shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-purple-600" />
+                  Have the interns assess each other for...
+                </CardTitle>
+                <CardDescription>
+                  Select what aspects you want each agent to evaluate in the other's response
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Assessment Criteria Checkboxes */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {ASSESSMENT_CRITERIA.map(criteria => (
+                    <div key={criteria} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={criteria}
+                        checked={selectedAssessmentCriteria.includes(criteria)}
+                        onCheckedChange={() => handleAssessmentCriteriaToggle(criteria)}
+                      />
+                      <label
+                        htmlFor={criteria}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                      >
+                        {criteria}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Go Button */}
+                <div className="text-center pt-4">
+                  <Button
+                    onClick={() => handleGetAssessment(question, results.agent1.response, results.agent2.response)}
+                    disabled={isAssessmentLoading || selectedAssessmentCriteria.length === 0}
+                    className="h-12 px-8 text-lg font-medium bg-purple-600 hover:bg-purple-700"
+                  >
+                    <Users className="mr-2 h-5 w-5" />
+                    {isAssessmentLoading ? 'Getting Assessments...' : 'Go!'}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         )}
 
@@ -608,27 +663,59 @@ const startFollowUpChain = () => {
                   </Card>
                 </div>
 
-
-
                 {/* Assessment and Follow-up buttons */}
                 <div className="text-center mt-6 space-y-4">
                   {/* Assessment button for this follow-up */}
+
                   {!followUpAssessments[index] && (
-                    <Button
-                      onClick={() => handleGetAssessment(
-                        followUp.question, 
-                        followUp.results.agent1.response, 
-                        followUp.results.agent2.response, 
-                        true, 
-                        index
-                      )}
-                      disabled={isAssessmentLoading}
-                      className="h-12 px-8 text-lg font-medium bg-purple-600 hover:bg-purple-700"
-                    >
-                      <Users className="mr-2 h-5 w-5" />
-                      {isAssessmentLoading ? 'Getting Assessments...' : 'Have the interns assess each other'}
-                    </Button>
+                    <Card className="shadow-md">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="flex items-center gap-2 text-lg">
+                          <Users className="h-4 w-4 text-purple-600" />
+                          Have the interns assess each other for...
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        {/* Assessment Criteria Checkboxes */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {ASSESSMENT_CRITERIA.map(criteria => (
+                            <div key={criteria} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`followup-${index}-${criteria}`}
+                                checked={selectedAssessmentCriteria.includes(criteria)}
+                                onCheckedChange={() => handleAssessmentCriteriaToggle(criteria)}
+                              />
+                              <label
+                                htmlFor={`followup-${index}-${criteria}`}
+                                className="text-xs font-medium leading-none cursor-pointer"
+                              >
+                                {criteria}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        {/* Go Button */}
+                        <div className="text-center pt-2">
+                          <Button
+                            onClick={() => handleGetAssessment(
+                              followUp.question, 
+                              followUp.results.agent1.response, 
+                              followUp.results.agent2.response, 
+                              true, 
+                              index
+                            )}
+                            disabled={isAssessmentLoading || selectedAssessmentCriteria.length === 0}
+                            className="h-10 px-6 text-sm font-medium bg-purple-600 hover:bg-purple-700"
+                          >
+                            <Users className="mr-2 h-4 w-4" />
+                            {isAssessmentLoading ? 'Getting Assessments...' : 'Go!'}
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
                   )}
+                 )}
                 </div>
                 
                 {/* Follow-up Assessment Results */}

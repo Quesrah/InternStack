@@ -266,6 +266,7 @@ def assess_responses():
         question = data.get('question')
         agent1_response = data.get('agent1_response')
         agent2_response = data.get('agent2_response')
+        assessment_criteria = data.get('assessment_criteria',[])
         
         # Validate input
         if not all([agent1_id, agent2_id, question, agent1_response, agent2_response]):
@@ -278,20 +279,27 @@ def assess_responses():
         agent1_info = ai_service.get_model_info(agent1_id)
         agent2_info = ai_service.get_model_info(agent2_id)
         
+        # Build assessment criteria text
+        if assessment_criteria:
+            criteria_text = "Focus your assessment on these specific aspects:\n" + "\n".join([f"- {criteria}" for criteria in assessment_criteria])
+        else:
+            criteria_text = "Assess its accuracy and completeness. Suggest improvements or revisions if needed."
+        
         assessment_prompt_template = """I asked the following question:
 "{question}"
 
 I received this answer:
 "{answer}"
 
-Assess its accuracy and completeness. Suggest improvements or revisions if needed."""
+{criteria}"""
+
         
         # Agent 2 assesses Agent 1's response
         try:
             assessment_of_agent1 = ai_service.get_completion(
                 agent2_info['provider'],
                 agent2_info['model'],
-                assessment_prompt_template.format(question=question, answer=agent1_response)
+                assessment_prompt_template.format(question=question, answer=agent1_response, criteria=criteria_text)
             )
         except Exception as e:
             assessment_of_agent1 = f"Error getting assessment: {str(e)}"
@@ -301,7 +309,7 @@ Assess its accuracy and completeness. Suggest improvements or revisions if neede
             assessment_of_agent2 = ai_service.get_completion(
                 agent1_info['provider'],
                 agent1_info['model'],
-                assessment_prompt_template.format(question=question, answer=agent2_response)
+                assessment_prompt_template.format(question=question, answer=agent2_response, criteria=criteria_text)
             )
         except Exception as e:
             assessment_of_agent2 = f"Error getting assessment: {str(e)}"
