@@ -60,7 +60,7 @@ AGENTS = [
         "domains": ["Chat/Reasoning"],
         "tags": ["General-purpose Q&A", "Open source"],
         "tier": "free",
-        "enabled": True
+        "enabled": False
     },
     {
         "id": "code-llama",
@@ -70,7 +70,7 @@ AGENTS = [
         "domains": ["Code"],
         "tags": ["Python", "JavaScript", "Code generation"],
         "tier": "free",
-        "enabled": True
+        "enabled": False
     },
     
     # Anthropic Models
