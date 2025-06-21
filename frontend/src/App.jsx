@@ -344,7 +344,7 @@ const startFollowUpChain = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <Zap className="h-8 w-8 text-blue-600" />
+            <SquareStack className="h-8 w-8 text-blue-600" />
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Intern Stack</h1>
           </div>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
@@ -457,7 +457,7 @@ const startFollowUpChain = () => {
                   </>
                 ) : (
                   <>
-                    <Zap className="mr-2 h-5 w-5" />
+                    <SquareStack className="mr-2 h-5 w-5" />
                     Compare Agents
                   </>
                 )}
@@ -801,7 +801,7 @@ const startFollowUpChain = () => {
                       </>
                     ) : (
                       <>
-                        <Zap className="mr-2 h-4 w-4" />
+                        <SquareStack className="mr-2 h-4 w-4" />
                         Ask Both Interns
                       </>
                     )}
