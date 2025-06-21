@@ -348,7 +348,7 @@ const startFollowUpChain = () => {
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Intern Stack</h1>
           </div>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Compare AI agents side-by-side and get them to assess each other. This is most valuable for: complex questions with multiple valid perspectives, technical tasks where accuracy matters, and creative prompts where style and structure vary.
+            Compare AI answers side-by-side with cross-assessments.
           </p>
         </div>
 
