@@ -358,17 +358,17 @@ const startFollowUpChain = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Brain className="h-5 w-5" />
-                Agent Comparison
+                Choose Your Interns
               </CardTitle>
               <CardDescription>
-                Select the interns you want to compare.
+                Select the AI models you want to compare.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Agent Selection */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium mb-2 block">First Intern</label>
+                  {/* <label className="text-sm font-medium mb-2 block">First Intern</label>*/}
                   {renderAgentSelect(selectedAgent1, setSelectedAgent1, "Select first intern")}
                   {selectedAgent1 && (
                     <div className="mt-2 flex flex-wrap gap-1">
@@ -381,7 +381,7 @@ const startFollowUpChain = () => {
                   )}
                 </div>
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Second Intern</label>
+                  {/*<label className="text-sm font-medium mb-2 block">Second Intern</label>*/}
                   {renderAgentSelect(selectedAgent2, setSelectedAgent2, "Select second intern")}
                   {selectedAgent2 && (
                     <div className="mt-2 flex flex-wrap gap-1">
@@ -480,7 +480,7 @@ const startFollowUpChain = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h4 className="font-medium mb-2">Original Response:</h4>
+                  {/*<h4 className="font-medium mb-2">Original Response:</h4>*/}
                   <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-200 dark:border-blue-800">
                     <p className="text-sm whitespace-pre-wrap">{results.agent1.response}</p>
                   </div>
@@ -499,7 +499,7 @@ const startFollowUpChain = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h4 className="font-medium mb-2">Original Response:</h4>
+                  {/*<h4 className="font-medium mb-2">Original Response:</h4>*/}
                   <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-md border border-green-200 dark:border-green-800">
                     <p className="text-sm whitespace-pre-wrap">{results.agent2.response}</p>
                   </div>
@@ -518,9 +518,6 @@ const startFollowUpChain = () => {
                   <Users className="h-5 w-5 text-purple-600" />
                   Have the interns assess each other for...
                 </CardTitle>
-                <CardDescription>
-                  Select what aspects you want each agent to evaluate in the other's response
-                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Assessment Criteria Checkboxes */}
