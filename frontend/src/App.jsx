@@ -767,18 +767,14 @@ const startFollowUpChain = () => {
             <Card className="shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Brain className="h-5 w-5" />
-                  Ask Another Follow-Up Question
+                  Follow-Up Discussion
                 </CardTitle>
-                <CardDescription>
-                  Continue the conversation with another follow-up question
-                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <label className="text-sm font-medium mb-2 block">Follow-up Question</label>
                   <Textarea
-                    placeholder="Ask another follow-up question..."
+                    placeholder="Provide more tasking. Prior content in this discussion will be included."
                     value={followUpQuestions[followUps.length] || ''}
                     onChange={(e) => handleFollowUpQuestionChange(followUps.length, e.target.value)}
                     className="min-h-[80px] resize-none"
