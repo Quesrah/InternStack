@@ -25,7 +25,7 @@ AGENTS = [
         "model": "gpt-4",
         "domains": ["Chat/Reasoning", "Code", "Analysis", "Creative"],
         "tags": ["Advanced reasoning", "Complex tasks", "Creative writing"],
-        "tier": "premium",
+        "tier": "free",
         "enabled": True
     },
     
