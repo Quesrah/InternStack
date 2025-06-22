@@ -26,7 +26,7 @@ AGENTS = [
         "domains": ["Chat/Reasoning", "Code", "Analysis", "Creative"],
         "tags": ["Advanced reasoning", "Complex tasks", "Creative writing"],
         "tier": "premium",
-        "enabled": False
+        "enabled": True
     },
     
     # Mistral AI Models (via Together.ai)
