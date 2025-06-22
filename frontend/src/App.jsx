@@ -361,7 +361,7 @@ const startFollowUpChain = () => {
                 Choose Your Interns
               </CardTitle>
               <CardDescription>
-                Select the AI models you want to compare.
+                Select the AI models you want to task.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -369,7 +369,7 @@ const startFollowUpChain = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   {/* <label className="text-sm font-medium mb-2 block">First Intern</label>*/}
-                  {renderAgentSelect(selectedAgent1, setSelectedAgent1, "Select first intern")}
+                  {renderAgentSelect(selectedAgent1, setSelectedAgent1, "Intern 1")}
                   {selectedAgent1 && (
                     <div className="mt-2 flex flex-wrap gap-1">
                       {getAgentById(selectedAgent1)?.tags.map(tag => (
@@ -382,7 +382,7 @@ const startFollowUpChain = () => {
                 </div>
                 <div>
                   {/*<label className="text-sm font-medium mb-2 block">Second Intern</label>*/}
-                  {renderAgentSelect(selectedAgent2, setSelectedAgent2, "Select second intern")}
+                  {renderAgentSelect(selectedAgent2, setSelectedAgent2, "Intern 2")}
                   {selectedAgent2 && (
                     <div className="mt-2 flex flex-wrap gap-1">
                       {getAgentById(selectedAgent2)?.tags.map(tag => (
@@ -397,9 +397,9 @@ const startFollowUpChain = () => {
 
               {/* Question Input */}
               <div>
-                <label className="text-sm font-medium mb-2 block">Your Question</label>
+                {/*<label className="text-sm font-medium mb-2 block">Your Question</label>*/}
                 <Textarea
-                  placeholder="Enter your question here..."
+                  placeholder="How is AI like an intern?"
                   value={question}
                   onChange={(e) => setQuestion(e.target.value)}
                   className="min-h-[100px] resize-none"
@@ -408,7 +408,7 @@ const startFollowUpChain = () => {
 
               {/* Best Practices */}
               <div>
-                <label className="text-sm font-medium mb-3 block">Best Practice Add-ons</label>
+                <label className="text-sm font-medium mb-3 block">Task Guidance</label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {bestPractices.map(practice => (
                     <div key={practice} className="flex items-center space-x-2">
@@ -458,7 +458,7 @@ const startFollowUpChain = () => {
                 ) : (
                   <>
                     <SquareStack className="mr-2 h-5 w-5" />
-                    Compare Agents
+                    Compare Results
                   </>
                 )}
               </Button>
@@ -606,7 +606,7 @@ const startFollowUpChain = () => {
                 className="h-12 px-8 text-lg font-medium"
               >
                 <Brain className="mr-2 h-5 w-5" />
-                Ask Follow-up Question
+                Continue the Discussion
               </Button>
             </div>
           </div>
