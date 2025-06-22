@@ -348,7 +348,7 @@ const startFollowUpChain = () => {
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Intern Stack</h1>
           </div>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Compare AI answers side-by-side with optional cross-assessments.
+            See AI results side-by-side. Have them assess the other's results.
           </p>
         </div>
 
@@ -358,10 +358,10 @@ const startFollowUpChain = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Brain className="h-5 w-5" />
-                Choose Your Interns
+                Choose Your AI Models
               </CardTitle>
               <CardDescription>
-                Select the AI models you want to task.
+                Select the interns you want to task:
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -811,7 +811,7 @@ const startFollowUpChain = () => {
     
         {/* Footer */}
         <div className="text-center mt-12 text-sm text-gray-500 dark:text-gray-400">
-          <p>Intern Stack MVP - Compare AI agents and make better decisions</p>
+          <p>Intern Stack MVP - Compare AI agents and gain confidence in the results</p>
           <p className="mt-1">Built with React, Tailwind CSS, and Flask</p>
         </div>
       </div>
