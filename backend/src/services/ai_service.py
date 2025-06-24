@@ -12,6 +12,9 @@ class AIService:
         self.openai_api_key = os.getenv('OPENAI_API_KEY')
         self.anthropic_api_key = os.getenv('ANTHROPIC_API_KEY')
         self.together_api_key = os.getenv('TOGETHER_API_KEY')
+        print("✅ OPENAI_API_KEY present?", bool(self.openai_api_key))
+        print("✅ ANTHROPIC_API_KEY present?", bool(self.anthropic_api_key))
+        print("✅ TOGETHER_API_KEY present?", bool(self.together_api_key))
         
         # Import AGENTS from api routes
         from src.routes.api import AGENTS

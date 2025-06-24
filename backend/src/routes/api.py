@@ -98,12 +98,13 @@ AGENTS = [
 
 # Best practice phrases that can be added to prompts
 BEST_PRACTICES = [
-    "List your response in numbered steps.",
-    "Explain your reasoning.",
-    "Keep it concise unless asked for depth.",
-    "Cite sources.",
-    "Break it down as if explaining to a 12-year-old."
-    "Be succinct."
+    "List your response in numbered steps",
+    "Explain your reasoning",
+    "Keep it concise unless asked for depth",
+    "Cite sources",
+    "Break it down as if explaining to a 12-year-old"
+    "Be succinct"
+    "Use an example"
 ]
 
 @api_bp.route('/health', methods=['GET'])
