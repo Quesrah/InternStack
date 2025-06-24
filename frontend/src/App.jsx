@@ -712,7 +712,6 @@ const startFollowUpChain = () => {
                       </CardContent>
                     </Card>
                   )}
-                 )}
                 </div>
                 
                 {/* Follow-up Assessment Results */}
